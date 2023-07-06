@@ -8,24 +8,24 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.preprocessing import image
 
-weights_url = "https://storage.googleapis.com/mledu-datasets/inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5"
-weights_file = "../data/weights/inception_v3.h5"
-urllib.request.urlretrieve(weights_url, weights_file)
+# weights_url = "https://storage.googleapis.com/mledu-datasets/inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5"
+# weights_file = "../data/weights/inception_v3.h5"
+# urllib.request.urlretrieve(weights_url, weights_file)
 
 pre_trained_model = InceptionV3(input_shape=(150, 150, 3),
                                 include_top=False,
-                                weights=None)
+                                weights='imagenet')
 
 
 
-pre_trained_model.load_weights(weights_file)
+# pre_trained_model.load_weights(weights_file)
 
 for layer in pre_trained_model.layers:
     layer.trainable = False
 
 pre_trained_model.summary()
 
-last_layer = pre_trained_model.get_layer('mixed7')
+last_layer = pre_trained_model.get_layer('mixed5')
 print('last layer output shape: ', last_layer.output_shape)
 last_output = last_layer.output
 
@@ -61,6 +61,7 @@ for file in classify:
     img = image.load_img(test_path + file, target_size=(150,150))
     x = image.img_to_array(img)
     x = np.expand_dims(x, axis=0)
+    x = x / 255.0
     image_tensor = np.vstack([x])
     classes = model.predict(image_tensor)
     print(classes[0])
